@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歌单曲目</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans SC', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: {
+                            850: '#151e2e',
+                            950: '#090d16',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0b132b;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+        /* 內嵌雪地背景圖層 + 冰藍柔和暗角遮罩，確保白色文字清晰易讀 */
+        .snow-bg-layer {
+            background-image: 
+                linear-gradient(to bottom, rgba(10, 18, 38, 0.35) 0%, rgba(12, 22, 46, 0.55) 50%, rgba(9, 15, 32, 0.78) 100%),
+                url("data:image/jpeg;base64,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");
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            transform: scale(1.04);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(100, 116, 139, 0.5);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, 0.7);
+        }
+        @keyframes highlightPulse {
+            0%, 100% { background-color: rgba(99, 102, 241, 0.32); border-color: rgba(129, 140, 248, 0.9); }
+            50% { background-color: rgba(99, 102, 241, 0.10); border-color: rgba(129, 140, 248, 0.3); }
+        }
+        .song-highlight {
+            animation: highlightPulse 1.5s ease-in-out 2;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+    <!-- 固定雪地背景圖層 (單一檔案內嵌，免附圖) -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div class="absolute inset-0 snow-bg-layer"></div>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="relative z-10 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 flex-grow">
+        
+        <!-- 1. 頁首區 (Header) -->
+        <header class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/65 backdrop-blur-md border border-sky-300/25 text-sky-200 text-xs font-medium mb-4 shadow-sm">
+                <span id="statusDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span id="dataSourceBadge">目前共收录 236 首歌曲</span>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-white drop-shadow-md mb-2.5">
+                歌单曲目
+            </h1>
+            <p class="text-slate-200/90 text-sm sm:text-base max-w-2xl mx-auto drop-shadow">
+                支持歌名/歌手/备注即时检索、语种与热门歌手筛选。点击任意歌曲即可一键复制！
+            </p>
+        </header>
+
+        <!-- 2. 控制與篩選面板 (Controls Panel) -->
+        <section class="bg-slate-900/65 backdrop-blur-xl border border-white/15 rounded-2xl p-4 sm:p-6 mb-6 shadow-2xl space-y-4">
+            
+            <!-- 搜尋框與隨機抽歌按鈕 -->
+            <div class="flex flex-col sm:flex-row gap-3">
+                <div class="relative flex-grow">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-300">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="搜寻歌名、歌手或备注（例如：周杰伦、R&B、520）..." 
+                        class="w-full pl-11 pr-10 py-3 bg-slate-950/75 border border-white/15 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition text-sm sm:text-base"
+                    >
+                    <button 
+                        id="clearSearchBtn" 
+                        class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white transition"
+                        title="清除搜寻"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- 隨機抽一首按鈕 -->
+                <button 
+                    id="randomPickBtn"
+                    class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium rounded-xl shadow-lg shadow-indigo-500/25 active:scale-[0.98] transition whitespace-nowrap text-sm sm:text-base"
+                >
+                    <span>🎲 随机抽一首</span>
+                </button>
+            </div>
+
+            <!-- 語言分類按鈕列 (已移除右側複製格式切換欄位) -->
+            <div class="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-white/10">
+                <div id="languageFilters" class="flex flex-wrap gap-2">
+                    <!-- 由 JavaScript 動態渲染 -->
+                </div>
+            </div>
+
+            <!-- 熱門歌手快速篩選列 -->
+            <div class="pt-3 border-t border-white/10">
+                <div class="text-xs text-slate-300 mb-2 flex items-center gap-1.5">
+                    <span>🎤 热门歌手快速筛选：</span>
+                </div>
+                <div id="artistFilters" class="flex flex-wrap gap-1.5">
+                    <!-- 由 JavaScript 動態渲染熱門歌手標籤 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 狀態列 -->
+        <div class="flex items-center justify-between px-2 mb-3 text-xs sm:text-sm text-slate-200 drop-shadow">
+            <div>
+                目前共显示 <span id="filteredCount" class="font-bold text-sky-300">0</span> 首歌曲
+                <span id="activeFilterText" class="text-slate-300/80 ml-1"></span>
+            </div>
+            <button id="quickResetBtn" class="hidden text-sky-300 hover:text-sky-200 underline underline-offset-4">
+                清除所有筛选条件
+            </button>
+        </div>
+
+        <!-- 4. 歌單列表區 (Song List Container) -->
+        <main class="bg-slate-900/65 backdrop-blur-xl border border-white/15 rounded-2xl overflow-hidden shadow-2xl">
+            
+            <!-- 電腦版表頭 (對應 4 個欄位：歌名、歌手、語言、備註) -->
+            <div class="hidden sm:grid sm:grid-cols-12 gap-4 px-6 py-3.5 bg-slate-950/75 border-b border-white/10 text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                <div class="col-span-4">歌名 (点击复制)</div>
+                <div class="col-span-3">歌手</div>
+                <div class="col-span-2">语言</div>
+                <div class="col-span-2">备注 / 版本</div>
+                <div class="col-span-1 text-right">操作</div>
+            </div>
+
+            <!-- 歌曲項目容器 -->
+            <div id="songListContainer" class="divide-y divide-white/10">
+                <!-- 由 JavaScript 動態渲染歌曲列 -->
+            </div>
+
+            <!-- 無搜尋結果時的空狀態 -->
+            <div id="emptyState" class="hidden py-16 px-4 text-center">
+                <h3 class="text-lg font-semibold text-white mb-1">找不到符合条件的歌曲</h3>
+                <p class="text-slate-300 text-sm mb-4">请试着更换搜寻关键字，或切换上方的语言与歌手标签。</p>
+                <button 
+                    id="resetFiltersBtn" 
+                    class="px-4 py-2 bg-slate-800/80 hover:bg-slate-700 text-sky-300 rounded-xl text-sm font-medium border border-white/10 transition"
+                >
+                    重设所有筛选条件
+                </button>
+            </div>
+        </main>
+
+    </div>
+
+    <!-- 頁尾 -->
+    <footer class="relative z-10 text-center py-6 text-xs text-slate-300/80 border-t border-white/10 bg-slate-950/40 backdrop-blur-sm">
+        <p>歌单曲目 · 点击任意歌曲即可一键复制（歌名 - 歌手）</p>
+    </footer>
+
+    <!-- 隨機抽歌結果彈跳小卡 -->
+    <div id="randomModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+        <div class="bg-slate-900/95 border border-white/20 rounded-2xl max-w-md w-full p-6 shadow-2xl transform transition-all">
+            <div class="flex items-center justify-between mb-4">
+                <span class="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-sky-300 bg-sky-500/15 px-3 py-1 rounded-full border border-sky-400/20">
+                    🎲 为你随机抽出这首歌
+                </span>
+                <button id="closeModalBtn" class="text-slate-400 hover:text-white p-1 rounded-lg">✕</button>
+            </div>
+            
+            <div class="bg-slate-950/90 border border-white/10 rounded-xl p-5 mb-5 text-center">
+                <div id="modalLanguageBadge" class="inline-block text-xs px-2.5 py-0.5 rounded-md mb-2 font-medium"></div>
+                <h2 id="modalSongTitle" class="text-2xl font-bold text-white mb-1"></h2>
+                <p id="modalSongArtist" class="text-slate-300 text-base mb-3"></p>
+                <p id="modalSongNote" class="text-xs text-slate-400"></p>
+            </div>
+
+            <div class="flex gap-3">
+                <button 
+                    onclick="pickRandomSong()"
+                    class="flex-1 py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl transition text-sm"
+                >
+                    再抽一次
+                </button>
+                <button 
+                    id="modalCopyBtn" 
+                    class="flex-1 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl shadow-lg shadow-indigo-600/30 transition text-sm"
+                >
+                    复制这首歌
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 複製成功通知提示 -->
+    <div 
+        id="toastNotification" 
+        class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-3 bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-2xl border border-emerald-400/30"
+    >
+        <span id="toastMessage" class="text-sm font-medium">已复制到剪贴簿！</span>
+    </div>
+
+    <!-- ==========================================
+         JavaScript 歌單資料與互動邏輯區
+    =========================================== -->
+    <script>
+        /**
+         * 【方案 A：自動讀取同目錄下的 songs.csv，若無則使用下方內建保底歌單】
+         * 維護方式：將匯出的 CSV 檔案命名為 songs.csv，與 index.html 放在同一個資料夾（或 GitHub 專案根目錄）即可自動載入完整歌單。
+         */
+        const CSV_FILE_PATH = "./songs.csv";
+
+        const DEFAULT_SONGS = [
+            // --- 周杰伦 ---
+            { title: "晴天", artist: "周杰伦", language: "国语", note: "校园经典" },
+            { title: "说了再见", artist: "周杰伦", language: "国语", note: "伤感情歌" },
+            { title: "红尘客栈", artist: "周杰伦", language: "国语", note: "中国风" },
+            { title: "一点点", artist: "周杰伦", language: "国语", note: "抒情情歌" },
+            { title: "简单爱", artist: "周杰伦", language: "国语", note: "经典甜歌" },
+            { title: "断了的弦", artist: "周杰伦", language: "国语", note: "经典情歌" },
+            { title: "发如雪", artist: "周杰伦", language: "国语", note: "中国风" },
+            { title: "园游会", artist: "周杰伦", language: "国语", note: "浪漫甜歌" },
+            { title: "天涯过客", artist: "周杰伦", language: "国语", note: "中国风" },
+            { title: "烟花易冷", artist: "周杰伦", language: "国语", note: "中国风" },
+            { title: "我是如此相信", artist: "周杰伦", language: "国语", note: "华语流行" },
+            { title: "兰亭序", artist: "周杰伦", language: "国语", note: "中国风" },
+            { title: "哪里都是你", artist: "周杰伦", language: "国语", note: "伤感情歌" },
+            { title: "枫", artist: "周杰伦", language: "国语", note: "伤感经典" },
+            { title: "红颜如霜", artist: "周杰伦", language: "国语", note: "中国风" },
+            { title: "我不配", artist: "周杰伦", language: "国语", note: "无干扰版" },
+            { title: "爱情废柴", artist: "周杰伦", language: "国语", note: "伤感抒情" },
+            { title: "牛仔很忙", artist: "周杰伦", language: "国语", note: "轻快流行" },
+            { title: "花海", artist: "周杰伦", language: "国语", note: "无干扰版" },
+            { title: "听见下雨的声音", artist: "周杰伦/魏如昀", language: "国语", note: "Cathedral Reverb Ver." },
+            { title: "蒲公英的约定", artist: "周杰伦", language: "国语", note: "经典情歌" },
+            { title: "等你下课", artist: "周杰伦", language: "国语", note: "校园抒情" },
+            { title: "最长的电影", artist: "周杰伦", language: "国语", note: "伤感经典" },
+            { title: "不能说的秘密", artist: "周杰伦", language: "国语", note: "经典情歌" },
+            { title: "安静", artist: "周杰伦", language: "国语", note: "伤感经典" },
+            { title: "爱在西元前", artist: "周杰伦", language: "国语", note: "经典流行" },
+            { title: "借口", artist: "周杰伦", language: "国语", note: "伤感经典" },
+            { title: "可爱女人", artist: "周杰伦", language: "国语", note: "经典甜歌" },
+            { title: "暗号", artist: "周杰伦", language: "国语", note: "强化版" },
+            { title: "我落泪情绪零碎", artist: "周杰伦", language: "国语", note: "强化版" },
+            { title: "一路向北", artist: "周杰伦", language: "国语", note: "+4Key版 / 经典" },
+            { title: "半岛铁盒", artist: "周杰伦", language: "国语", note: "经典R&B" },
+            { title: "你听得到", artist: "周杰伦", language: "国语", note: "纯净版" },
+            { title: "青花瓷", artist: "周杰伦", language: "国语", note: "中国风" },
+            { title: "说好不哭", artist: "周杰伦", language: "国语", note: "抒情流行" },
+            { title: "浪漫手机", artist: "周杰伦", language: "国语", note: "R&B甜歌" },
+            { title: "明明就", artist: "周杰伦", language: "国语", note: "伤感抒情" },
+            { title: "告白气球", artist: "周杰伦", language: "国语", note: "浪漫甜歌" },
+            { title: "爱你没差", artist: "周杰伦", language: "国语", note: "伤感流行" },
+            { title: "爱情悬崖", artist: "周杰伦", language: "国语", note: "经典情歌" },
+            { title: "给我一首歌的时间", artist: "周杰伦", language: "国语", note: "经典R&B" },
+            { title: "反方向的钟", artist: "周杰伦", language: "国语", note: "经典流行" },
+            { title: "搁浅", artist: "周杰伦", language: "国语", note: "高音伤感" },
+            { title: "轨迹", artist: "周杰伦", language: "国语", note: "经典情歌" },
+            { title: "退后", artist: "周杰伦", language: "国语", note: "经典情歌" },
+            { title: "大笨钟", artist: "周杰伦", language: "国语", note: "轻快甜歌" },
+            { title: "手写的从前", artist: "周杰伦", language: "国语", note: "校园抒情" },
+            { title: "不该", artist: "周杰伦/张惠妹", language: "国语", note: "男女对唱" },
+            { title: "雨下一整晚", artist: "周杰伦", language: "国语", note: "中国风" },
+            { title: "珊瑚海", artist: "周杰伦/梁心颐", language: "国语", note: "男女对唱" },
+            { title: "圣诞星", artist: "周杰伦", language: "国语", note: "华语流行" },
+
+            // --- 林俊杰 ---
+            { title: "不为谁而作的歌", artist: "林俊杰", language: "国语", note: "华语流行" },
+            { title: "黑夜问白天", artist: "林俊杰", language: "国语", note: "李泫憙(Live)伴奏 / 经典" },
+            { title: "背对背拥抱", artist: "林俊杰", language: "国语", note: "经典情歌" },
+            { title: "学不会", artist: "林俊杰", language: "国语", note: "伤感抒情" },
+            { title: "修炼爱情", artist: "林俊杰", language: "国语", note: "经典情歌" },
+            { title: "江南", artist: "林俊杰", language: "国语", note: "中国风 / 经典" },
+            { title: "新地球", artist: "林俊杰", language: "国语", note: "华语流行" },
+            { title: "她说", artist: "林俊杰", language: "国语", note: "抒情经典" },
+            { title: "那些你很冒险的梦", artist: "林俊杰", language: "国语", note: "经典情歌" },
+            { title: "醉赤壁", artist: "林俊杰", language: "国语", note: "中国风" },
+            { title: "关键词", artist: "林俊杰", language: "国语", note: "中国风 / 抒情" },
+            { title: "美人鱼", artist: "林俊杰", language: "国语", note: "华语流行" },
+            { title: "我还想她", artist: "林俊杰", language: "国语", note: "伤感抒情" },
+            { title: "西界", artist: "林俊杰", language: "国语", note: "华语流行" },
+            { title: "幸存者", artist: "林俊杰", language: "国语", note: "华语流行" },
+            { title: "愿与愁", artist: "林俊杰", language: "国语", note: "华语流行" },
+            { title: "将故事写成我们", artist: "林俊杰", language: "国语", note: "浪漫古风" },
+            { title: "手心的蔷薇", artist: "林俊杰/邓紫棋", language: "国语", note: "男女对唱" },
+            { title: "豆浆油条", artist: "林俊杰", language: "国语", note: "甜歌" },
+            { title: "不潮不用花钱", artist: "林俊杰", language: "国语", note: "轻快流行" },
+            { title: "不死之身", artist: "林俊杰", language: "国语", note: "华语流行" },
+            { title: "不流泪的机场", artist: "林俊杰", language: "国语", note: "伤感抒情" },
+            { title: "爱笑的眼睛", artist: "林俊杰", language: "国语", note: "经典情歌" },
+            { title: "第几个一百天", artist: "林俊杰", language: "国语", note: "华语流行" },
+            { title: "裹着心的光", artist: "林俊杰", language: "国语", note: "治愈流行" },
+            { title: "交换余生", artist: "林俊杰", language: "国语", note: "华语流行" },
+            { title: "孤独娱乐", artist: "林俊杰", language: "国语", note: "华语流行" },
+            { title: "十万毫升泪水", artist: "林俊杰/蔡健雅", language: "国语", note: "抒情" },
+            { title: "冻结", artist: "林俊杰", language: "国语", note: "经典情歌" },
+            { title: "可惜没如果", artist: "林俊杰", language: "国语", note: "经典情歌" },
+            { title: "生生", artist: "林俊杰", language: "国语", note: "华语流行" },
+            { title: "当你", artist: "林俊杰/王心凌", language: "国语", note: "521 状态不错" },
+            { title: "小酒窝", artist: "林俊杰/蔡卓妍", language: "国语", note: "521 状态不错 / 甜歌" },
+            { title: "Always Online", artist: "林俊杰", language: "国语", note: "经典流行" },
+            { title: "Love U U", artist: "林俊杰", language: "国语", note: "抒情甜歌" },
+            { title: "期待爱", artist: "林俊杰/金莎", language: "国语", note: "甜歌" },
+
+            // --- A-Lin ---
+            { title: "幸福了然后呢", artist: "A-Lin", language: "国语", note: "伤感流行" },
+            { title: "失恋无罪", artist: "A-Lin", language: "国语", note: "经典抒情" },
+            { title: "有一种悲伤", artist: "A-Lin", language: "国语", note: "影视OST" },
+            { title: "罪恶感", artist: "A-Lin", language: "国语", note: "抒情" },
+            { title: "我们会更好的", artist: "A-Lin", language: "国语", note: "治愈流行" },
+            { title: "挚友", artist: "A-Lin", language: "国语", note: "伤感爆款" },
+            { title: "荒唐", artist: "A-Lin", language: "国语", note: "高音抒情" },
+            { title: "给我一个理由忘记", artist: "A-Lin", language: "国语", note: "520 / 经典伤感" },
+            { title: "无人知晓的我", artist: "A-Lin", language: "国语", note: "抒情" },
+            { title: "拿走了什么", artist: "A-Lin", language: "国语", note: "伤感抒情" },
+            { title: "幸福太短", artist: "A-Lin", language: "国语", note: "影视OST" },
+            { title: "寂寞不痛", artist: "A-Lin", language: "国语", note: "经典伤感" },
+            { title: "以前以后", artist: "A-Lin", language: "国语", note: "伤感抒情" },
+            { title: "爱 请问怎么走", artist: "A-Lin", language: "国语", note: "经典伤感" },
+
+            // --- 张惠妹 ---
+            { title: "听海", artist: "张惠妹", language: "国语", note: "经典苦情" },
+            { title: "勇敢", artist: "张惠妹", language: "国语", note: "励志抒情" },
+            { title: "身后", artist: "张惠妹", language: "国语", note: "催泪抒情" },
+            { title: "我恨我爱你", artist: "张惠妹", language: "国语", note: "经典伤感" },
+            { title: "记得", artist: "张惠妹", language: "国语", note: "经典情歌" },
+            { title: "真实", artist: "张惠妹", language: "国语", note: "无干扰版" },
+            { title: "掉了", artist: "张惠妹", language: "国语", note: "无干扰版 / 520" },
+            { title: "趁早", artist: "张惠妹/张宇", language: "国语", note: "521 状态不错" },
+            { title: "人质", artist: "张惠妹", language: "国语", note: "经典抒情" },
+            { title: "如果你也听说", artist: "张惠妹", language: "国语", note: "伤感经典" },
+            { title: "我要快乐", artist: "张惠妹", language: "国语", note: "经典抒情" },
+            { title: "血腥爱情故事", artist: "张惠妹", language: "国语", note: "暗黑高音" },
+            { title: "连名带姓", artist: "张惠妹", language: "国语", note: "张神儿版 / 经典" },
+            { title: "你是爱我的", artist: "张惠妹", language: "国语", note: "伤感抒情" },
+
+            // --- 孙燕姿 ---
+            { title: "我怀念的", artist: "孙燕姿", language: "国语", note: "经典情歌" },
+            { title: "我不难过", artist: "孙燕姿", language: "国语", note: "经典伤感" },
+            { title: "雨天", artist: "孙燕姿", language: "国语", note: "伤感经典" },
+            { title: "开始懂了", artist: "孙燕姿", language: "国语", note: "治愈经典" },
+            { title: "天黑黑", artist: "孙燕姿", language: "国语", note: "经典民谣" },
+            { title: "眼泪成诗", artist: "孙燕姿", language: "国语", note: "古风抒情" },
+            { title: "遇见", artist: "孙燕姿", language: "国语", note: "经典情歌" },
+            { title: "克卜勒", artist: "孙燕姿", language: "国语", note: "治愈抒情" },
+            { title: "坏的好人", artist: "孙燕姿", language: "国语", note: "抒情" },
+            { title: "半句再见", artist: "孙燕姿", language: "国语", note: "伤感小品" },
+
+            // --- 蔡健雅 ---
+            { title: "被驯服的象", artist: "蔡健雅", language: "国语", note: "流行" },
+            { title: "达尔文", artist: "蔡健雅", language: "国语", note: "无干扰版" },
+            { title: "红色高跟鞋", artist: "蔡健雅", language: "国语", note: "都市流行" },
+            { title: "空白格", artist: "蔡健雅", language: "国语", note: "伤感经典" },
+            { title: "抛物线", artist: "蔡健雅", language: "国语", note: "治愈抒情" },
+            { title: "无底洞", artist: "蔡健雅", language: "国语", note: "经典情歌" },
+            { title: "停格", artist: "蔡健雅", language: "国语", note: "影视OST" },
+            { title: "陌生人", artist: "蔡健雅", language: "国语", note: "经典情歌" },
+            { title: "坠落", artist: "蔡健雅", language: "国语", note: "伤感抒情" },
+            { title: "紫藤花", artist: "蔡健雅/S.H.E", language: "国语", note: "抒情" },
+            { title: "Letting Go", artist: "蔡健雅", language: "国语", note: "伤感爆款" },
+
+            // --- 薛之谦 ---
+            { title: "天外来物", artist: "薛之谦", language: "国语", note: "热门流行" },
+            { title: "你还要我怎样", artist: "薛之谦", language: "国语", note: "伤感经典" },
+            { title: "像风一样", artist: "薛之谦", language: "国语", note: "古风感抒情" },
+            { title: "动物世界", artist: "薛之谦", language: "国语", note: "流行" },
+            { title: "我好像在哪见过你", artist: "薛之谦", language: "国语", note: "无干扰版" },
+            { title: "暧昧", artist: "薛之谦/杨丞琳", language: "国语", note: "伤感流行" },
+            { title: "陪你去流浪", artist: "薛之谦", language: "国语", note: "抒情流行" },
+            { title: "哑巴", artist: "薛之谦", language: "国语", note: "521 状态不错" },
+
+            // --- 陶喆 ---
+            { title: "爱，很简单", artist: "陶喆", language: "国语", note: "R&B经典" },
+            { title: "就是爱你", artist: "陶喆", language: "国语", note: "R&B甜歌" },
+            { title: "普通朋友", artist: "陶喆", language: "国语", note: "R&B经典" },
+            { title: "小镇姑娘", artist: "陶喆", language: "国语", note: "R&B经典" },
+            { title: "飞机场的10:30", artist: "陶喆", language: "国语", note: "R&B经典" },
+            { title: "沙滩", artist: "陶喆", language: "国语", note: "R&B经典" },
+            { title: "流沙", artist: "陶喆", language: "国语", note: "520 / R&B经典" },
+            { title: "Melody", artist: "陶喆", language: "国语", note: "Remix / 经典" },
+            { title: "讨厌红楼梦", artist: "陶喆", language: "国语", note: "R&B流行" },
+            { title: "一念", artist: "陶喆", language: "国语", note: "流行" },
+
+            // --- 梁静茹 ---
+            { title: "爱久见人心", artist: "梁静茹", language: "国语", note: "无干扰版" },
+            { title: "崇拜", artist: "梁静茹", language: "国语", note: "伤感高音" },
+            { title: "会呼吸的痛", artist: "梁静茹", language: "国语", note: "经典伤感" },
+            { title: "情歌", artist: "梁静茹", language: "国语", note: "你写给我 我的第一首歌" },
+            { title: "可惜不是你", artist: "梁静茹", language: "国语", note: "经典伤感" },
+            { title: "慢冷", artist: "梁静茹", language: "国语", note: "伤感抒情" },
+            { title: "暖暖", artist: "梁静茹", language: "国语", note: "轻快甜歌" },
+            { title: "分手快乐", artist: "梁静茹", language: "国语", note: "治愈经典" },
+
+            // --- 王力宏 ---
+            { title: "爱错", artist: "王力宏", language: "国语", note: "升级版 / 经典" },
+            { title: "你不知道的事", artist: "王力宏", language: "国语", note: "影视OST" },
+            { title: "心跳", artist: "王力宏", language: "国语", note: "流行情歌" },
+            { title: "Forever Love", artist: "王力宏", language: "国语", note: "待完善版" },
+            { title: "唯一", artist: "王力宏/告五人", language: "国语", note: "经典情歌" },
+            { title: "落叶归根", artist: "王力宏", language: "国语", note: "经典抒情" },
+
+            // --- 邓紫棋 ---
+            { title: "来自天堂的魔鬼", artist: "邓紫棋", language: "国语", note: "电音流行" },
+            { title: "泡沫", artist: "邓紫棋", language: "国语", note: "高音经典" },
+            { title: "A.I.N.Y. 爱你", artist: "邓紫棋", language: "国语", note: "高音经典" },
+            { title: "多远都要在一起", artist: "邓紫棋", language: "国语", note: "升级版" },
+            { title: "光年之外", artist: "邓紫棋", language: "国语", note: "影视OST" },
+            { title: "我的秘密", artist: "邓紫棋", language: "国语", note: "甜歌" },
+            { title: "写不完的温柔", artist: "邓紫棋", language: "国语", note: "Where Did U Go" },
+
+            // --- 杨丞琳 ---
+            { title: "雨爱", artist: "杨丞琳", language: "国语", note: "经典情歌" },
+            { title: "带我走", artist: "杨丞琳", language: "国语", note: "高音抒情" },
+            { title: "年轮说", artist: "杨丞琳", language: "国语", note: "治愈流行" },
+            { title: "过敏", artist: "杨丞琳", language: "国语", note: "伤感流行" },
+            { title: "理想情人", artist: "杨丞琳", language: "国语", note: "甜歌" },
+            { title: "想幸福的人", artist: "杨丞琳", language: "国语", note: "抒情" },
+            { title: "点水", artist: "杨丞琳", language: "国语", note: "温柔抒情" },
+
+            // --- 周兴哲 ---
+            { title: "怎么了", artist: "周兴哲", language: "国语", note: "伤感流行" },
+            { title: "以后别做朋友", artist: "周兴哲", language: "国语", note: "校园伤感" },
+            { title: "永不失联的爱", artist: "周兴哲", language: "国语", note: "深情经典" },
+            { title: "你，好不好", artist: "周兴哲", language: "国语", note: "伤感经典" },
+            { title: "如果雨之后", artist: "周兴哲", language: "国语", note: "伤感抒情" },
+            { title: "我很快乐", artist: "周兴哲", language: "国语", note: "伤感情歌" },
+
+            // --- 方大同 ---
+            { title: "特别的人", artist: "方大同", language: "国语", note: "R&B经典" },
+            { title: "Love Song", artist: "方大同", language: "国语", note: "R&B经典" },
+            { title: "爱在", artist: "方大同", language: "国语", note: "R&B流行" },
+            { title: "三人游", artist: "方大同", language: "国语", note: "R&B抒情" },
+            { title: "回留", artist: "方大同", language: "国语", note: "伤感爵士" },
+            { title: "每天每天", artist: "方大同", language: "国语", note: "520 / R&B" },
+
+            // --- 徐佳莹 ---
+            { title: "行走的鱼", artist: "徐佳莹", language: "国语", note: "抒情经典" },
+            { title: "失落沙洲", artist: "徐佳莹", language: "国语", note: "经典伤感" },
+            { title: "言不由衷", artist: "徐佳莹", language: "国语", note: "治愈抒情" },
+            { title: "心里学", artist: "徐佳莹", language: "国语", note: "抒情" },
+            { title: "身骑白马", artist: "徐佳莹", language: "国语", note: "戏腔流行" },
+            { title: "到此为止", artist: "徐佳莹/连诗雅", language: "粤语", note: "伤感经典" },
+
+            // --- 陈奕迅 ---
+            { title: "淘汰", artist: "陈奕迅", language: "国语", note: "经典情歌" },
+            { title: "不要说话", artist: "陈奕迅", language: "国语", note: "伤感经典" },
+            { title: "圣诞结", artist: "陈奕迅", language: "国语", note: "无干扰版" },
+            { title: "爱情转移", artist: "陈奕迅", language: "国语", note: "经典情歌" },
+            { title: "我们", artist: "陈奕迅", language: "国语", note: "影视OST" },
+
+            // --- 莫文蔚 ---
+            { title: "阴天", artist: "莫文蔚", language: "国语", note: "都市经典" },
+            { title: "盛夏的果实", artist: "莫文蔚", language: "国语", note: "经典情歌" },
+            { title: "电台情歌", artist: "莫文蔚", language: "国语", note: "经典情歌" },
+            { title: "慢慢喜欢你", artist: "莫文蔚", language: "国语", note: "优化(没伴奏)版本" },
+            { title: "这世界那么多人", artist: "莫文蔚", language: "国语", note: "治愈影视OST" },
+            { title: "宝贝", artist: "莫文蔚/张悬", language: "国语", note: "温柔民谣" },
+
+            // --- 王菲 ---
+            { title: "红豆", artist: "王菲/方大同", language: "国语", note: "经典翻唱" },
+            { title: "传奇", artist: "王菲/李健", language: "国语", note: "空灵经典" },
+            { title: "百年孤寂", artist: "王菲", language: "国语", note: "经典摇滚" },
+            { title: "如愿", artist: "王菲", language: "国语", note: "治愈大气" },
+            { title: "我爱你", artist: "王菲/卢广仲", language: "国语", note: "Dry Vocal·零修音直出" },
+
+            // --- 蔡依林 / 王心凌 / 曹格 / 林宥嘉 / 陈粒 / 其他华语经典 ---
+            { title: "倒带", artist: "蔡依林", language: "国语", note: "经典摇滚抒情" },
+            { title: "妥协", artist: "蔡依林", language: "国语", note: "伤感经典" },
+            { title: "说爱你", artist: "蔡依林", language: "国语", note: "轻快甜歌" },
+            { title: "爱你", artist: "王心凌", language: "国语", note: "Oh~baby 情话多说一点" },
+            { title: "大眠", artist: "王心凌", language: "国语", note: "伤感爆款" },
+            { title: "第一次爱的人", artist: "王心凌", language: "国语", note: "经典翻唱" },
+            { title: "寂寞先生", artist: "曹格", language: "国语", note: "高音伤感" },
+            { title: "背叛", artist: "曹格", language: "国语", note: "经典苦情" },
+            { title: "PK", artist: "曹格/梁静茹", language: "国语", note: "男女对唱" },
+            { title: "想自由", artist: "林宥嘉", language: "国语", note: "抒情摇滚" },
+            { title: "心酸", artist: "林宥嘉", language: "国语", note: "伤感抒情" },
+            { title: "天真有邪", artist: "林宥嘉", language: "国语", note: "伤感流行" },
+            { title: "说谎", artist: "林宥嘉", language: "国语", note: "经典伤感" },
+            { title: "兜圈", artist: "林宥嘉", language: "国语", note: "治愈甜歌" },
+            { title: "小半", artist: "陈粒", language: "国语", note: "独立民谣" },
+            { title: "虚拟", artist: "陈粒", language: "国语", note: "独立民谣" },
+            { title: "易燃易爆炸", artist: "陈粒", language: "国语", note: "暗黑摇滚" },
+            { title: "这，就是爱", artist: "张杰", language: "国语", note: "高音大气" },
+            { title: "明天过后", artist: "张杰", language: "国语", note: "经典情歌" },
+            { title: "无人之岛", artist: "任然", language: "国语", note: "治愈流行" },
+            { title: "飞鸟和蝉", artist: "任然", language: "国语", note: "热门抒情" },
+            { title: "疑心病", artist: "任然", language: "国语", note: "伤感流行" },
+            { title: "雀跃", artist: "任然", language: "国语", note: "轻快甜歌" },
+            { title: "最初的记忆", artist: "徐佳莹", language: "国语", note: "夏至未至OST" },
+            { title: "夏夜最后的烟火", artist: "颜人中", language: "国语", note: "温柔R&B" },
+            { title: "晚安", artist: "颜人中", language: "国语", note: "深夜抒情" },
+            { title: "有些", artist: "颜人中", language: "国语", note: "伤感" },
+            { title: "嘉宾", artist: "张远", language: "国语", note: "苦情爆款" },
+            { title: "阿拉斯加海湾", artist: "蓝心羽", language: "国语", note: "深情抒情" },
+            { title: "刻在我心底的名字", artist: "卢广仲", language: "国语", note: "影视OST" },
+            { title: "几分之几", artist: "卢广仲", language: "国语", note: "温暖治愈" },
+            { title: "如果可以", artist: "韦礼安", language: "国语", note: "月老OST" },
+            { title: "水星记", artist: "郭顶", language: "国语", note: "迷幻抒情" },
+            { title: "凄美地", artist: "郭顶", language: "国语", note: "独立流行" },
+            { title: "牵丝戏", artist: "银临/Aki阿杰", language: "国语", note: "古风经典" },
+            { title: "锦鲤抄", artist: "银临/云の泣", language: "国语", note: "古风经典" },
+            { title: "赤伶", artist: "HITA", language: "国语", note: "古风戏腔" },
+            { title: "我的一个道姑朋友", artist: "以冬", language: "国语", note: "古风叙事" },
+            { title: "呼吸决定", artist: "Fine乐团", language: "国语", note: "独立抒情" },
+            { title: "我不需要", artist: "Fine乐团", language: "国语", note: "独立抒情" },
+            { title: "起风了", artist: "买辣椒也用券", language: "国语", note: "治愈神曲" },
+            { title: "体面", artist: "于文文", language: "国语", note: "无干扰版 / 520" },
+            { title: "好想爱这个世界啊", artist: "华晨宇", language: "国语", note: "治愈高音" },
+            { title: "烟火里的尘埃", artist: "华晨宇", language: "国语", note: "迷幻高音" },
+            { title: "模特", artist: "李荣浩", language: "国语", note: "都市流行" },
+            { title: "戒烟", artist: "李荣浩", language: "国语", note: "流行" },
+            { title: "小幸运", artist: "田馥甄", language: "国语", note: "校园经典" },
+            { title: "魔鬼中的天使", artist: "田馥甄", language: "国语", note: "伤感经典" },
+            { title: "寂寞寂寞就好", artist: "田馥甄", language: "国语", note: "伤感流行" },
+            { title: "你就不要想起我", artist: "田馥甄", language: "国语", note: "催泪高音" },
+            { title: "Lydia", artist: "F.I.R.飞儿乐团", language: "国语", note: "经典摇滚" },
+            { title: "月牙湾", artist: "F.I.R.飞儿乐团", language: "国语", note: "经典中国风" },
+            { title: "我们的爱", artist: "F.I.R.飞儿乐团", language: "国语", note: "经典高音" },
+            { title: "千年之恋", artist: "F.I.R.飞儿乐团", language: "国语", note: "无干扰版" },
+            { title: "鱼", artist: "怕胖团 PAPUN BAND", language: "国语", note: "独立乐团" },
+            { title: "距离 (Distance)", artist: "余佳运", language: "国语", note: "R&B甜歌" },
+            { title: "不跟你好了", artist: "小忧专属曲", language: "国语", note: "小忧人狠话不多" },
+            { title: "灰色", artist: "徐佳莹", language: "国语", note: "主播说唱太累不能点" },
+            { title: "你啊你啊", artist: "魏如萱", language: "国语", note: "温柔民谣" },
+
+            // --- 粤语 / 闽南语 ---
+            { title: "喜帖街", artist: "谢安琪", language: "粤语", note: "粤语经典" },
+            { title: "只是太爱你", artist: "张敬轩", language: "国语", note: "深情经典" },
+            { title: "情人", artist: "Beyond", language: "粤语", note: "经典粤语" },
+            { title: "浪子回头", artist: "茄子蛋", language: "闽南语", note: "摇滚经典" },
+
+            // --- 日语 ---
+            { title: "Lemon", artist: "米津玄师", language: "日语", note: "日剧《法医女王》OST" },
+            { title: "unravel", artist: "TK from 凛として時雨", language: "日语", note: "痛 太痛了の小曲" },
+            { title: "打上花火", artist: "DAOKO/米津玄师", language: "日语", note: "动漫OST" },
+            { title: "恋爱循环", artist: "花泽香菜", language: "日语", note: "经典动漫甜歌" },
+            { title: "心做し (心理作用)", artist: "蝶々P", language: "日语", note: "催泪高音" },
+            { title: "たぶん (大概)", artist: "YOASOBI", language: "日语", note: "J-Pop流行" },
+            { title: "Euterpe", artist: "EGOIST", language: "日语", note: "罪恶王冠OP" },
+            { title: "Departures", artist: "EGOIST", language: "日语", note: "罪恶王冠ED" },
+            { title: "恋爱审判", artist: "40mP", language: "日语", note: "轻快日文" },
+            { title: "月光", artist: "鬼束千寻", language: "日语", note: "圈套OST" },
+            { title: "First Love", artist: "宇多田光", language: "日语", note: "跨时代经典" },
+            { title: "春日影", artist: "MyGO!!!!!", language: "日语", note: "为什么要演奏春日影" },
+
+            // --- 英语 ---
+            { title: "Legends Never Die", artist: "Against the Current", language: "英语", note: "英雄联盟S7主题曲" },
+            { title: "Paper Hearts", artist: "Tori Kelly", language: "英语", note: "温柔抒情英文" },
+            { title: "Glassy Sky", artist: "Donna Burke", language: "英语", note: "东京喰种插曲" },
+            { title: "Call of Silence", artist: "Gemie", language: "英语", note: "进击的巨人插曲" },
+            { title: "Sincerely", artist: "TRUE", language: "日语", note: "紫罗兰永恒花园OP" },
+            { title: "We Don't Talk Anymore", artist: "Charlie Puth", language: "英语", note: "流行经典" },
+            { title: "When I Was Your Man", artist: "Bruno Mars", language: "英语", note: "深情钢琴" },
+            { title: "That's What I Like", artist: "Bruno Mars", language: "英语", note: "轻快R&B" },
+            { title: "Always", artist: "Daniel Caesar", language: "英语", note: "氛围R&B" },
+            { title: "Best Part", artist: "H.E.R./Daniel Caesar", language: "英语", note: "R&B经典对唱" },
+            { title: "2 soon", artist: "keshi", language: "英语", note: "Lo-Fi R&B" },
+            { title: "My Heart Will Go On", artist: "Celine Dion", language: "英语", note: "我心永恒" },
+            { title: "Love Story", artist: "Taylor Swift", language: "英语", note: "经典流行" },
+            { title: "bad guy", artist: "Billie Eilish", language: "英语", note: "潮流电音" },
+            { title: "Because Of You", artist: "Ne-Yo", language: "英语", note: "R&B经典" },
+            { title: "The Day You Went Away", artist: "M2M", language: "英语", note: "经典英文" },
+            { title: "Wonderful U", artist: "AGA", language: "英语", note: "强化版 / 浪漫抒情" }
+        ];
+
+        // 語言分類與熱門歌手清單
+        const CATEGORIES = ["全部", "国语", "粤语", "日语", "英语", "闽南语"];
+        const POPULAR_ARTISTS = [
+            "全部歌手", "周杰伦", "林俊杰", "A-Lin", "张惠妹", "孙燕姿", 
+            "蔡健雅", "薛之谦", "陶喆", "梁静茹", "王力宏", "邓紫棋", 
+            "杨丞琳", "周兴哲", "方大同", "徐佳莹", "陈奕迅", "莫文蔚", "田馥甄"
+        ];
+
+        // 狀態管理變數
+        let allSongs = [...DEFAULT_SONGS];
+        let currentCategory = "全部";
+        let currentArtist = "全部歌手";
+        let currentSearchQuery = "";
+        let currentRandomSong = null;
+        let toastTimeout = null;
+
+        // 語言標籤配色對應 (同時支援簡體與繁體)
+        const LANGUAGE_COLORS = {
+            "国语": "bg-rose-500/20 text-rose-200 border-rose-400/30",
+            "國語": "bg-rose-500/20 text-rose-200 border-rose-400/30",
+            "日语": "bg-sky-500/20 text-sky-200 border-sky-400/30",
+            "日語": "bg-sky-500/20 text-sky-200 border-sky-400/30",
+            "粤语": "bg-amber-500/20 text-amber-200 border-amber-400/30",
+            "粵語": "bg-amber-500/20 text-amber-200 border-amber-400/30",
+            "英语": "bg-emerald-500/20 text-emerald-200 border-emerald-400/30",
+            "英語": "bg-emerald-500/20 text-emerald-200 border-emerald-400/30",
+            "闽南语": "bg-purple-500/20 text-purple-200 border-purple-400/30",
+            "其他": "bg-slate-500/20 text-slate-200 border-slate-400/30"
+        };
+
+        // DOM 元素取得
+        const searchInput = document.getElementById("searchInput");
+        const clearSearchBtn = document.getElementById("clearSearchBtn");
+        const languageFiltersContainer = document.getElementById("languageFilters");
+        const artistFiltersContainer = document.getElementById("artistFilters");
+        const songListContainer = document.getElementById("songListContainer");
+        const filteredCountEl = document.getElementById("filteredCount");
+        const activeFilterTextEl = document.getElementById("activeFilterText");
+        const quickResetBtn = document.getElementById("quickResetBtn");
+        const emptyStateEl = document.getElementById("emptyState");
+        const resetFiltersBtn = document.getElementById("resetFiltersBtn");
+        const randomPickBtn = document.getElementById("randomPickBtn");
+        const dataSourceBadge = document.getElementById("dataSourceBadge");
+
+        // 隨機抽歌彈出視窗元素
+        const randomModal = document.getElementById("randomModal");
+        const closeModalBtn = document.getElementById("closeModalBtn");
+        const modalCopyBtn = document.getElementById("modalCopyBtn");
+
+        /**
+         * 初始化應用程式（方案 A：自動靜默讀取同目錄 ./songs.csv，若無則使用內建歌單）
+         */
+        async function initApp() {
+            try {
+                localStorage.removeItem("user_google_sheet_csv_url");
+            } catch (e) {}
+
+            try {
+                const response = await fetch(CSV_FILE_PATH, { cache: "no-cache" });
+                if (response.ok) {
+                    const csvText = await response.text();
+                    const parsedSongs = parseCSV(csvText);
+                    if (parsedSongs.length > 0) {
+                        allSongs = parsedSongs;
+                    }
+                }
+            } catch (error) {
+                // 若在本地端直接點開或未放置 songs.csv，靜默維持 DEFAULT_SONGS
+            }
+
+            dataSourceBadge.textContent = `目前共收录 ${allSongs.length} 首歌曲`;
+            renderAllFiltersAndSongs();
+            setupEventListeners();
+        }
+
+        /**
+         * 統一重新渲染篩選器與列表
+         */
+        function renderAllFiltersAndSongs() {
+            renderLanguageButtons();
+            renderArtistButtons();
+            renderSongs();
+        }
+
+        /**
+         * 解析 CSV 結構（對應欄位：歌名, 歌手, 语言, 备注）
+         */
+        function parseCSV(csvText) {
+            const cleanText = csvText.replace(/^\uFEFF/, "");
+            const lines = cleanText.split(/\r?\n/).filter(line => line.trim() !== "");
+            if (lines.length < 2) return [];
+
+            const result = [];
+            for (let i = 1; i < lines.length; i++) {
+                const cols = lines[i].split(/,(?=(?:(?:[^"]*")2)*[^"]*$)/).map(col => col.replace(/^"|"$/g, "").trim());
+                if (cols[0]) {
+                    result.push({
+                        title: cols[0] || "未命名歌曲",
+                        artist: cols[1] || "未知歌手",
+                        language: cols[2] || "国语",
+                        note: cols[3] || ""
+                    });
+                }
+            }
+            return result;
+        }
+
+        /**
+         * 取得符合目前「語言 + 歌手 + 搜尋詞」的歌曲
+         */
+        function getFilteredSongs() {
+            const query = currentSearchQuery.toLowerCase().trim();
+            return allSongs.filter(song => {
+                const matchCategory = (currentCategory === "全部") || (song.language && song.language.includes(currentCategory));
+                const matchArtist = (currentArtist === "全部歌手") || (song.artist && song.artist.includes(currentArtist));
+                const matchQuery = !query || 
+                    song.title.toLowerCase().includes(query) ||
+                    song.artist.toLowerCase().includes(query) ||
+                    (song.note && song.note.toLowerCase().includes(query));
+                
+                return matchCategory && matchArtist && matchQuery;
+            });
+        }
+
+        /**
+         * 渲染語言分類按鈕
+         */
+        function renderLanguageButtons() {
+            languageFiltersContainer.innerHTML = "";
+            const query = currentSearchQuery.toLowerCase().trim();
+
+            CATEGORIES.forEach(category => {
+                const count = allSongs.filter(song => {
+                    const matchCat = (category === "全部") || (song.language && song.language.includes(category));
+                    const matchArt = (currentArtist === "全部歌手") || (song.artist && song.artist.includes(currentArtist));
+                    const matchQ = !query || 
+                        song.title.toLowerCase().includes(query) ||
+                        song.artist.toLowerCase().includes(query) ||
+                        (song.note && song.note.toLowerCase().includes(query));
+                    return matchCat && matchArt && matchQ;
+                }).length;
+
+                const isActive = (currentCategory === category);
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = isActive
+                    ? "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold bg-indigo-600 text-white shadow-md shadow-indigo-600/30 transition"
+                    : "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-medium bg-slate-800/80 text-slate-200 hover:bg-slate-700 hover:text-white border border-white/10 transition";
+
+                btn.innerHTML = `
+                    <span>${category}</span>
+                    <span class="px-1.5 py-0.2 text-xs rounded-full ${isActive ? 'bg-indigo-800 text-indigo-100' : 'bg-slate-900/90 text-slate-300'}">
+                        ${count}
+                    </span>
+                `;
+
+                btn.addEventListener("click", () => {
+                    currentCategory = category;
+                    renderAllFiltersAndSongs();
+                });
+
+                languageFiltersContainer.appendChild(btn);
+            });
+        }
+
+        /**
+         * 渲染熱門歌手快速篩選標籤
+         */
+        function renderArtistButtons() {
+            artistFiltersContainer.innerHTML = "";
+
+            POPULAR_ARTISTS.forEach(artist => {
+                const isActive = (currentArtist === artist);
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = isActive
+                    ? "px-3 py-1 rounded-lg text-xs font-semibold bg-purple-600 text-white shadow-sm transition"
+                    : "px-3 py-1 rounded-lg text-xs font-medium bg-slate-950/65 text-slate-300 hover:bg-slate-800 hover:text-white border border-white/10 transition";
+
+                btn.textContent = artist;
+                btn.addEventListener("click", () => {
+                    currentArtist = artist;
+                    renderAllFiltersAndSongs();
+                });
+
+                artistFiltersContainer.appendChild(btn);
+            });
+        }
+
+        /**
+         * 渲染歌曲列表
+         */
+        function renderSongs() {
+            const filtered = getFilteredSongs();
+            filteredCountEl.textContent = filtered.length;
+            songListContainer.innerHTML = "";
+
+            // 更新篩選條件提示與重設按鈕
+            const hasActiveFilter = currentCategory !== "全部" || currentArtist !== "全部歌手" || currentSearchQuery.trim() !== "";
+            quickResetBtn.classList.toggle("hidden", !hasActiveFilter);
+            activeFilterTextEl.textContent = hasActiveFilter 
+                ? `(筛选：${currentCategory} · ${currentArtist}${currentSearchQuery ? ` · "${currentSearchQuery}"` : ""})` 
+                : "";
+
+            if (filtered.length === 0) {
+                emptyStateEl.classList.remove("hidden");
+                return;
+            }
+            emptyStateEl.classList.add("hidden");
+
+            filtered.forEach((song, index) => {
+                const badgeClass = LANGUAGE_COLORS[song.language] || LANGUAGE_COLORS["其他"];
+                const row = document.createElement("div");
+                row.id = `song-row-${index}`;
+                row.className = "group hover:bg-white/10 active:bg-white/15 transition cursor-pointer px-4 sm:px-6 py-3.5";
+                
+                row.addEventListener("click", () => copySongToClipboard(song));
+
+                row.innerHTML = `
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-1.5 sm:gap-4 items-center">
+                        <!-- 1. 歌名 -->
+                        <div class="sm:col-span-4 flex items-center justify-between sm:justify-start gap-2">
+                            <div class="font-semibold text-white group-hover:text-sky-300 transition text-base sm:text-sm">
+                                ${escapeHTML(song.title)}
+                            </div>
+                            <span class="sm:hidden text-xs px-2 py-0.5 rounded-md border ${badgeClass}">
+                                ${escapeHTML(song.language)}
+                            </span>
+                        </div>
+
+                        <!-- 2. 歌手 -->
+                        <div class="sm:col-span-3 text-slate-200 text-sm">
+                            ${escapeHTML(song.artist)}
+                        </div>
+
+                        <!-- 3. 語言 -->
+                        <div class="hidden sm:flex sm:col-span-2 items-center">
+                            <span class="text-xs px-2.5 py-0.5 rounded-md border font-medium ${badgeClass}">
+                                ${escapeHTML(song.language)}
+                            </span>
+                        </div>
+
+                        <!-- 4. 備註 -->
+                        <div class="sm:col-span-2 text-xs text-slate-300/80 truncate" title="${escapeHTML(song.note || '')}">
+                            ${song.note ? escapeHTML(song.note) : '<span class="text-slate-500">—</span>'}
+                        </div>
+
+                        <!-- 5. 複製按鈕 -->
+                        <div class="hidden sm:flex sm:col-span-1 justify-end">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800/80 group-hover:bg-indigo-600 text-slate-200 group-hover:text-white text-xs font-medium border border-white/10 transition">
+                                复制
+                            </span>
+                        </div>
+                    </div>
+                `;
+
+                songListContainer.appendChild(row);
+            });
+        }
+
+        /**
+         * 複製歌曲到剪貼簿（統一預設為：歌名 - 歌手）
+         */
+        function copySongToClipboard(song) {
+            const textToCopy = `${song.title} - ${song.artist}`;
+
+            const tempInput = document.createElement("textarea");
+            tempInput.value = textToCopy;
+            tempInput.style.position = "fixed";
+            tempInput.style.opacity = "0";
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            
+            try {
+                document.execCommand("copy");
+                showToast(`已复制：「${textToCopy}」`);
+            } catch (err) {
+                showToast("复制失败，请手动选取复制");
+            } finally {
+                document.body.removeChild(tempInput);
+            }
+        }
+
+        /**
+         * 顯示右下角 Toast 通知
+         */
+        function showToast(message) {
+            const toast = document.getElementById("toastNotification");
+            const toastMsg = document.getElementById("toastMessage");
+            toastMsg.textContent = message;
+
+            toast.classList.remove("translate-y-20", "opacity-0");
+            toast.classList.add("translate-y-0", "opacity-100");
+
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove("translate-y-0", "opacity-100");
+                toast.classList.add("translate-y-20", "opacity-0");
+            }, 2500);
+        }
+
+        /**
+         * 隨機抽歌功能
+         */
+        function pickRandomSong() {
+            const filtered = getFilteredSongs();
+            if (filtered.length === 0) {
+                showToast("目前筛选清单中没有歌曲可抽！");
+                return;
+            }
+
+            const randomIndex = Math.floor(Math.random() * filtered.length);
+            currentRandomSong = filtered[randomIndex];
+
+            const badgeEl = document.getElementById("modalLanguageBadge");
+            badgeEl.textContent = currentRandomSong.language;
+            badgeEl.className = `inline-block text-xs px-2.5 py-0.5 rounded-md mb-2 border font-medium ${LANGUAGE_COLORS[currentRandomSong.language] || LANGUAGE_COLORS["其他"]}`;
+
+            document.getElementById("modalSongTitle").textContent = currentRandomSong.title;
+            document.getElementById("modalSongArtist").textContent = currentRandomSong.artist;
+            document.getElementById("modalSongNote").textContent = currentRandomSong.note || "";
+
+            randomModal.classList.remove("hidden");
+
+            const targetRow = document.getElementById(`song-row-${randomIndex}`);
+            if (targetRow) {
+                targetRow.scrollIntoView({ behavior: "smooth", block: "center" });
+                targetRow.classList.remove("song-highlight");
+                void targetRow.offsetWidth;
+                targetRow.classList.add("song-highlight");
+            }
+        }
+
+        function escapeHTML(str) {
+            if (!str) return "";
+            return str.replace(/[&<>"']/g, m => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[m]);
+        }
+
+        function resetAllFilters() {
+            searchInput.value = "";
+            currentSearchQuery = "";
+            currentCategory = "全部";
+            currentArtist = "全部歌手";
+            clearSearchBtn.classList.add("hidden");
+            renderAllFiltersAndSongs();
+        }
+
+        /**
+         * 綁定事件監聽器
+         */
+        function setupEventListeners() {
+            searchInput.addEventListener("input", (e) => {
+                currentSearchQuery = e.target.value;
+                clearSearchBtn.classList.toggle("hidden", currentSearchQuery.length === 0);
+                renderAllFiltersAndSongs();
+            });
+
+            clearSearchBtn.addEventListener("click", () => {
+                searchInput.value = "";
+                currentSearchQuery = "";
+                clearSearchBtn.classList.add("hidden");
+                renderAllFiltersAndSongs();
+                searchInput.focus();
+            });
+
+            resetFiltersBtn.addEventListener("click", resetAllFilters);
+            quickResetBtn.addEventListener("click", resetAllFilters);
+
+            // 隨機抽歌彈窗
+            randomPickBtn.addEventListener("click", pickRandomSong);
+            closeModalBtn.addEventListener("click", () => randomModal.classList.add("hidden"));
+            randomModal.addEventListener("click", (e) => {
+                if (e.target === randomModal) randomModal.classList.add("hidden");
+            });
+            modalCopyBtn.addEventListener("click", () => {
+                if (currentRandomSong) {
+                    copySongToClipboard(currentRandomSong);
+                    randomModal.classList.add("hidden");
+                }
+            });
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
