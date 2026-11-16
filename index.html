@@ -36,7 +36,7 @@
             color: #f8fafc;
             overflow-x: hidden;
         }
-        /* 內嵌雪地背景圖層 + 冰藍柔和暗角遮罩，確保白色文字清晰易讀 */
+        /* 内嵌雪地背景图层 + 冰蓝柔和暗角遮罩，确保白色文字清晰易读 */
         .snow-bg-layer {
             background-image: 
                 linear-gradient(to bottom, rgba(10, 18, 38, 0.35) 0%, rgba(12, 22, 46, 0.55) 50%, rgba(9, 15, 32, 0.78) 100%),
@@ -71,7 +71,7 @@
 </head>
 <body class="min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
 
-    <!-- 固定雪地背景圖層 (單一檔案內嵌，免附圖) -->
+    <!-- 固定雪地背景图层 (单一档案内嵌，免附图) -->
     <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div class="absolute inset-0 snow-bg-layer"></div>
     </div>
@@ -79,7 +79,7 @@
     <!-- 主容器 -->
     <div class="relative z-10 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 flex-grow">
         
-        <!-- 1. 頁首區 (Header) -->
+        <!-- 1. 页首区 (Header) -->
         <header class="text-center mb-8">
             <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/65 backdrop-blur-md border border-sky-300/25 text-sky-200 text-xs font-medium mb-4 shadow-sm">
                 <span id="statusDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -93,10 +93,10 @@
             </p>
         </header>
 
-        <!-- 2. 控制與篩選面板 (Controls Panel) -->
+        <!-- 2. 控制与筛选面板 (Controls Panel) -->
         <section class="bg-slate-900/65 backdrop-blur-xl border border-white/15 rounded-2xl p-4 sm:p-6 mb-6 shadow-2xl space-y-4">
             
-            <!-- 搜尋框與隨機抽歌按鈕 -->
+            <!-- 搜寻框与随机抽歌按钮 -->
             <div class="flex flex-col sm:flex-row gap-3">
                 <div class="relative flex-grow">
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-300">
@@ -121,7 +121,7 @@
                     </button>
                 </div>
 
-                <!-- 隨機抽一首按鈕 -->
+                <!-- 随机抽一首按钮 -->
                 <button 
                     id="randomPickBtn"
                     class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium rounded-xl shadow-lg shadow-indigo-500/25 active:scale-[0.98] transition whitespace-nowrap text-sm sm:text-base"
@@ -130,25 +130,25 @@
                 </button>
             </div>
 
-            <!-- 語言分類按鈕列 (已移除右側複製格式切換欄位) -->
+            <!-- 语言分类按钮列 -->
             <div class="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-white/10">
                 <div id="languageFilters" class="flex flex-wrap gap-2">
-                    <!-- 由 JavaScript 動態渲染 -->
+                    <!-- 由 JavaScript 动态渲染 -->
                 </div>
             </div>
 
-            <!-- 熱門歌手快速篩選列 -->
+            <!-- 热门歌手快速筛选列 -->
             <div class="pt-3 border-t border-white/10">
                 <div class="text-xs text-slate-300 mb-2 flex items-center gap-1.5">
                     <span>🎤 热门歌手快速筛选：</span>
                 </div>
                 <div id="artistFilters" class="flex flex-wrap gap-1.5">
-                    <!-- 由 JavaScript 動態渲染熱門歌手標籤 -->
+                    <!-- 由 JavaScript 动态渲染热门歌手标签 -->
                 </div>
             </div>
         </section>
 
-        <!-- 3. 狀態列 -->
+        <!-- 3. 状态列 -->
         <div class="flex items-center justify-between px-2 mb-3 text-xs sm:text-sm text-slate-200 drop-shadow">
             <div>
                 目前共显示 <span id="filteredCount" class="font-bold text-sky-300">0</span> 首歌曲
@@ -159,10 +159,10 @@
             </button>
         </div>
 
-        <!-- 4. 歌單列表區 (Song List Container) -->
+        <!-- 4. 歌单列表区 (Song List Container) -->
         <main class="bg-slate-900/65 backdrop-blur-xl border border-white/15 rounded-2xl overflow-hidden shadow-2xl">
             
-            <!-- 電腦版表頭 (對應 4 個欄位：歌名、歌手、語言、備註) -->
+            <!-- 电脑版表头 (对应 4 个栏位：歌名、歌手、语言、备注) -->
             <div class="hidden sm:grid sm:grid-cols-12 gap-4 px-6 py-3.5 bg-slate-950/75 border-b border-white/10 text-xs font-semibold text-slate-300 uppercase tracking-wider">
                 <div class="col-span-4">歌名 (点击复制)</div>
                 <div class="col-span-3">歌手</div>
@@ -171,12 +171,12 @@
                 <div class="col-span-1 text-right">操作</div>
             </div>
 
-            <!-- 歌曲項目容器 -->
+            <!-- 歌曲项目容器 -->
             <div id="songListContainer" class="divide-y divide-white/10">
-                <!-- 由 JavaScript 動態渲染歌曲列 -->
+                <!-- 由 JavaScript 动态渲染歌曲列 -->
             </div>
 
-            <!-- 無搜尋結果時的空狀態 -->
+            <!-- 无搜寻结果时的空状态 -->
             <div id="emptyState" class="hidden py-16 px-4 text-center">
                 <h3 class="text-lg font-semibold text-white mb-1">找不到符合条件的歌曲</h3>
                 <p class="text-slate-300 text-sm mb-4">请试着更换搜寻关键字，或切换上方的语言与歌手标签。</p>
@@ -191,12 +191,12 @@
 
     </div>
 
-    <!-- 頁尾 -->
+    <!-- 页尾 -->
     <footer class="relative z-10 text-center py-6 text-xs text-slate-300/80 border-t border-white/10 bg-slate-950/40 backdrop-blur-sm">
         <p>歌单曲目 · 点击任意歌曲即可一键复制（歌名 - 歌手）</p>
     </footer>
 
-    <!-- 隨機抽歌結果彈跳小卡 -->
+    <!-- 随机抽歌结果弹跳小卡 -->
     <div id="randomModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
         <div class="bg-slate-900/95 border border-white/20 rounded-2xl max-w-md w-full p-6 shadow-2xl transform transition-all">
             <div class="flex items-center justify-between mb-4">
@@ -230,7 +230,7 @@
         </div>
     </div>
 
-    <!-- 複製成功通知提示 -->
+    <!-- 复制成功通知提示 -->
     <div 
         id="toastNotification" 
         class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-3 bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-2xl border border-emerald-400/30"
@@ -239,15 +239,16 @@
     </div>
 
     <!-- ==========================================
-         JavaScript 歌單資料與互動邏輯區
+         JavaScript 歌单资料与互动逻辑区
     =========================================== -->
     <script>
         /**
-         * 【方案 A：自動讀取同目錄下的 songs.csv，若無則使用下方內建保底歌單】
-         * 維護方式：將匯出的 CSV 檔案命名為 songs.csv，與 index.html 放在同一個資料夾（或 GitHub 專案根目錄）即可自動載入完整歌單。
+         * Google Apps Script 网路应用程式网址
+         * 以后如果更换了试算表脚本网址，只要改这一行引号里面的内容即可
          */
-        const CSV_FILE_PATH = "./songs.csv";
+        const apiURL = 'https://script.google.com/macros/s/AKfycbzJedenbMkMUWz396HIStUJW_aJ0lrUHHEHXwG94AQLymw1CddvEGAcqaoUiXQSxDIBbw/exec';
 
+        // 内建保底歌单（在网路读取中、或读取失败时会暂时显示这份歌单）
         const DEFAULT_SONGS = [
             // --- 周杰伦 ---
             { title: "晴天", artist: "周杰伦", language: "国语", note: "校园经典" },
@@ -602,7 +603,7 @@
             { title: "Wonderful U", artist: "AGA", language: "英语", note: "强化版 / 浪漫抒情" }
         ];
 
-        // 語言分類與熱門歌手清單
+        // 语言分类与热门歌手清单
         const CATEGORIES = ["全部", "国语", "粤语", "日语", "英语", "闽南语"];
         const POPULAR_ARTISTS = [
             "全部歌手", "周杰伦", "林俊杰", "A-Lin", "张惠妹", "孙燕姿", 
@@ -610,7 +611,7 @@
             "杨丞琳", "周兴哲", "方大同", "徐佳莹", "陈奕迅", "莫文蔚", "田馥甄"
         ];
 
-        // 狀態管理變數
+        // 状态管理变数
         let allSongs = [...DEFAULT_SONGS];
         let currentCategory = "全部";
         let currentArtist = "全部歌手";
@@ -618,7 +619,7 @@
         let currentRandomSong = null;
         let toastTimeout = null;
 
-        // 語言標籤配色對應 (同時支援簡體與繁體)
+        // 语言标签配色对应 (同时支援简体与繁体)
         const LANGUAGE_COLORS = {
             "国语": "bg-rose-500/20 text-rose-200 border-rose-400/30",
             "國語": "bg-rose-500/20 text-rose-200 border-rose-400/30",
@@ -629,6 +630,7 @@
             "英语": "bg-emerald-500/20 text-emerald-200 border-emerald-400/30",
             "英語": "bg-emerald-500/20 text-emerald-200 border-emerald-400/30",
             "闽南语": "bg-purple-500/20 text-purple-200 border-purple-400/30",
+            "閩南語": "bg-purple-500/20 text-purple-200 border-purple-400/30",
             "其他": "bg-slate-500/20 text-slate-200 border-slate-400/30"
         };
 
@@ -646,39 +648,70 @@
         const randomPickBtn = document.getElementById("randomPickBtn");
         const dataSourceBadge = document.getElementById("dataSourceBadge");
 
-        // 隨機抽歌彈出視窗元素
+        // 随机抽歌弹出视窗元素
         const randomModal = document.getElementById("randomModal");
         const closeModalBtn = document.getElementById("closeModalBtn");
         const modalCopyBtn = document.getElementById("modalCopyBtn");
 
         /**
-         * 初始化應用程式（方案 A：自動靜默讀取同目錄 ./songs.csv，若無則使用內建歌單）
+         * 初始化应用程式：先渲染画面，再向 Google 试算表同步歌单
          */
         async function initApp() {
             try {
                 localStorage.removeItem("user_google_sheet_csv_url");
             } catch (e) {}
 
-            try {
-                const response = await fetch(CSV_FILE_PATH, { cache: "no-cache" });
-                if (response.ok) {
-                    const csvText = await response.text();
-                    const parsedSongs = parseCSV(csvText);
-                    if (parsedSongs.length > 0) {
-                        allSongs = parsedSongs;
-                    }
-                }
-            } catch (error) {
-                // 若在本地端直接點開或未放置 songs.csv，靜默維持 DEFAULT_SONGS
-            }
-
-            dataSourceBadge.textContent = `目前共收录 ${allSongs.length} 首歌曲`;
+            // 先用内建歌单渲染，让网页打开瞬间就能浏览与搜索
+            dataSourceBadge.textContent = `目前共收录 ${allSongs.length} 首歌曲（正在同步云端歌单...）`;
             renderAllFiltersAndSongs();
             setupEventListeners();
+
+            // 向 Google 试算表抓取最新歌单
+            await loadPlaylist();
         }
 
         /**
-         * 統一重新渲染篩選器與列表
+         * 串接 Google Apps Script API 读取试算表歌单
+         */
+        async function loadPlaylist() {
+            try {
+                const response = await fetch(apiURL);
+                if (!response.ok) {
+                    throw new Error(`HTTP 状态异常: ${response.status}`);
+                }
+                const rawData = await response.json();
+                console.log('成功取得歌单：', rawData);
+
+                // 兼容直接返回数组，或包在 data / songs / rows 里的格式
+                const rawList = Array.isArray(rawData)
+                    ? rawData
+                    : (rawData.songs || rawData.data || rawData.rows || []);
+
+                // 兼容英文栏位名或中文表头（歌名/歌手/语言/备注）
+                const formattedSongs = rawList
+                    .map(item => ({
+                        title: String(item.title ?? item.song ?? item.name ?? item['歌名'] ?? item['歌曲'] ?? '').trim(),
+                        artist: String(item.artist ?? item.singer ?? item['歌手'] ?? item['艺人'] ?? '').trim() || '未知歌手',
+                        language: String(item.language ?? item.lang ?? item['语言'] ?? item['語言'] ?? item['语种'] ?? '').trim() || '国语',
+                        note: String(item.note ?? item.remark ?? item.remarks ?? item['备注'] ?? item['備註'] ?? item['备注 / 版本'] ?? item['版本'] ?? '').trim()
+                    }))
+                    .filter(song => song.title !== '');
+
+                if (formattedSongs.length > 0) {
+                    allSongs = formattedSongs;
+                    dataSourceBadge.textContent = `目前共收录 ${allSongs.length} 首歌曲（已同步云端歌单）`;
+                    renderAllFiltersAndSongs();
+                } else {
+                    dataSourceBadge.textContent = `目前共收录 ${allSongs.length} 首歌曲（云端尚无资料）`;
+                }
+            } catch (error) {
+                console.error('读取歌单失败：', error);
+                dataSourceBadge.textContent = `目前共收录 ${allSongs.length} 首歌曲（使用预设歌单）`;
+            }
+        }
+
+        /**
+         * 统一重新渲染筛选器与列表
          */
         function renderAllFiltersAndSongs() {
             renderLanguageButtons();
@@ -687,47 +720,42 @@
         }
 
         /**
-         * 解析 CSV 結構（對應欄位：歌名, 歌手, 语言, 备注）
+         * 语言比对（自动兼容简繁体字，例如试算表填「國語」也能被「国语」筛选到）
          */
-        function parseCSV(csvText) {
-            const cleanText = csvText.replace(/^\uFEFF/, "");
-            const lines = cleanText.split(/\r?\n/).filter(line => line.trim() !== "");
-            if (lines.length < 2) return [];
-
-            const result = [];
-            for (let i = 1; i < lines.length; i++) {
-                const cols = lines[i].split(/,(?=(?:(?:[^"]*")2)*[^"]*$)/).map(col => col.replace(/^"|"$/g, "").trim());
-                if (cols[0]) {
-                    result.push({
-                        title: cols[0] || "未命名歌曲",
-                        artist: cols[1] || "未知歌手",
-                        language: cols[2] || "国语",
-                        note: cols[3] || ""
-                    });
-                }
-            }
-            return result;
+        function matchLanguage(songLang, filterCat) {
+            if (filterCat === "全部") return true;
+            if (!songLang) return false;
+            const normalized = String(songLang)
+                .replace(/國/g, "国")
+                .replace(/語/g, "语")
+                .replace(/粵/g, "粤")
+                .replace(/閩/g, "闽");
+            return normalized.includes(filterCat);
         }
 
         /**
-         * 取得符合目前「語言 + 歌手 + 搜尋詞」的歌曲
+         * 取得符合目前「语言 + 歌手 + 搜寻词」的歌曲
          */
         function getFilteredSongs() {
             const query = currentSearchQuery.toLowerCase().trim();
             return allSongs.filter(song => {
-                const matchCategory = (currentCategory === "全部") || (song.language && song.language.includes(currentCategory));
-                const matchArtist = (currentArtist === "全部歌手") || (song.artist && song.artist.includes(currentArtist));
+                const title = String(song.title || "");
+                const artist = String(song.artist || "");
+                const note = String(song.note || "");
+
+                const matchCategory = matchLanguage(song.language, currentCategory);
+                const matchArtist = (currentArtist === "全部歌手") || artist.includes(currentArtist);
                 const matchQuery = !query || 
-                    song.title.toLowerCase().includes(query) ||
-                    song.artist.toLowerCase().includes(query) ||
-                    (song.note && song.note.toLowerCase().includes(query));
+                    title.toLowerCase().includes(query) ||
+                    artist.toLowerCase().includes(query) ||
+                    note.toLowerCase().includes(query);
                 
                 return matchCategory && matchArtist && matchQuery;
             });
         }
 
         /**
-         * 渲染語言分類按鈕
+         * 渲染语言分类按钮
          */
         function renderLanguageButtons() {
             languageFiltersContainer.innerHTML = "";
@@ -735,12 +763,16 @@
 
             CATEGORIES.forEach(category => {
                 const count = allSongs.filter(song => {
-                    const matchCat = (category === "全部") || (song.language && song.language.includes(category));
-                    const matchArt = (currentArtist === "全部歌手") || (song.artist && song.artist.includes(currentArtist));
+                    const title = String(song.title || "");
+                    const artist = String(song.artist || "");
+                    const note = String(song.note || "");
+
+                    const matchCat = matchLanguage(song.language, category);
+                    const matchArt = (currentArtist === "全部歌手") || artist.includes(currentArtist);
                     const matchQ = !query || 
-                        song.title.toLowerCase().includes(query) ||
-                        song.artist.toLowerCase().includes(query) ||
-                        (song.note && song.note.toLowerCase().includes(query));
+                        title.toLowerCase().includes(query) ||
+                        artist.toLowerCase().includes(query) ||
+                        note.toLowerCase().includes(query);
                     return matchCat && matchArt && matchQ;
                 }).length;
 
@@ -768,7 +800,7 @@
         }
 
         /**
-         * 渲染熱門歌手快速篩選標籤
+         * 渲染热门歌手快速筛选标签
          */
         function renderArtistButtons() {
             artistFiltersContainer.innerHTML = "";
@@ -799,7 +831,7 @@
             filteredCountEl.textContent = filtered.length;
             songListContainer.innerHTML = "";
 
-            // 更新篩選條件提示與重設按鈕
+            // 更新筛选条件提示与重设按钮
             const hasActiveFilter = currentCategory !== "全部" || currentArtist !== "全部歌手" || currentSearchQuery.trim() !== "";
             quickResetBtn.classList.toggle("hidden", !hasActiveFilter);
             activeFilterTextEl.textContent = hasActiveFilter 
@@ -837,19 +869,19 @@
                             ${escapeHTML(song.artist)}
                         </div>
 
-                        <!-- 3. 語言 -->
+                        <!-- 3. 语言 -->
                         <div class="hidden sm:flex sm:col-span-2 items-center">
                             <span class="text-xs px-2.5 py-0.5 rounded-md border font-medium ${badgeClass}">
                                 ${escapeHTML(song.language)}
                             </span>
                         </div>
 
-                        <!-- 4. 備註 -->
+                        <!-- 4. 备注 -->
                         <div class="sm:col-span-2 text-xs text-slate-300/80 truncate" title="${escapeHTML(song.note || '')}">
                             ${song.note ? escapeHTML(song.note) : '<span class="text-slate-500">—</span>'}
                         </div>
 
-                        <!-- 5. 複製按鈕 -->
+                        <!-- 5. 复制按钮 -->
                         <div class="hidden sm:flex sm:col-span-1 justify-end">
                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800/80 group-hover:bg-indigo-600 text-slate-200 group-hover:text-white text-xs font-medium border border-white/10 transition">
                                 复制
@@ -863,7 +895,7 @@
         }
 
         /**
-         * 複製歌曲到剪貼簿（統一預設為：歌名 - 歌手）
+         * 复制歌曲到剪贴簿（统一预设为：歌名 - 歌手）
          */
         function copySongToClipboard(song) {
             const textToCopy = `${song.title} - ${song.artist}`;
@@ -886,7 +918,7 @@
         }
 
         /**
-         * 顯示右下角 Toast 通知
+         * 显示右下角 Toast 通知
          */
         function showToast(message) {
             const toast = document.getElementById("toastNotification");
@@ -904,7 +936,7 @@
         }
 
         /**
-         * 隨機抽歌功能
+         * 随机抽歌功能
          */
         function pickRandomSong() {
             const filtered = getFilteredSongs();
@@ -936,8 +968,8 @@
         }
 
         function escapeHTML(str) {
-            if (!str) return "";
-            return str.replace(/[&<>"']/g, m => ({
+            if (str === null || str === undefined) return "";
+            return String(str).replace(/[&<>"']/g, m => ({
                 '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
             })[m]);
         }
@@ -952,7 +984,7 @@
         }
 
         /**
-         * 綁定事件監聽器
+         * 绑定事件监听器
          */
         function setupEventListeners() {
             searchInput.addEventListener("input", (e) => {
@@ -972,7 +1004,7 @@
             resetFiltersBtn.addEventListener("click", resetAllFilters);
             quickResetBtn.addEventListener("click", resetAllFilters);
 
-            // 隨機抽歌彈窗
+            // 随机抽歌弹窗
             randomPickBtn.addEventListener("click", pickRandomSong);
             closeModalBtn.addEventListener("click", () => randomModal.classList.add("hidden"));
             randomModal.addEventListener("click", (e) => {
