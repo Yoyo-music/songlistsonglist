@@ -82,8 +82,8 @@
         <!-- 1. 页首区 (Header) -->
         <header class="text-center mb-8">
             <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/65 backdrop-blur-md border border-sky-300/25 text-sky-200 text-xs font-medium mb-4 shadow-sm">
-                <span id="statusDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span id="dataSourceBadge">目前共收录 236 首歌曲</span>
+                <span id="statusDot" class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+                <span id="dataSourceBadge">云端同步中，请稍等约 5 秒将自动加载最新歌单...</span>
             </div>
             <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-white drop-shadow-md mb-2.5">
                 歌单曲目
@@ -230,10 +230,23 @@
         </div>
     </div>
 
-    <!-- 复制成功通知提示 -->
+    <!-- 回到置顶悬浮小按钮 -->
+    <button
+        id="backToTopBtn"
+        type="button"
+        title="回到页面顶部"
+        class="fixed bottom-6 right-6 z-40 opacity-0 pointer-events-none translate-y-4 transition-all duration-300 inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-full bg-slate-900/85 hover:bg-indigo-600 text-slate-100 hover:text-white backdrop-blur-md border border-white/20 shadow-xl text-xs font-medium active:scale-95"
+    >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 15l7-7 7 7"></path>
+        </svg>
+        <span>回到顶部</span>
+    </button>
+
+    <!-- 复制成功通知提示（位于回到顶部按钮上方，避免重叠遮挡） -->
     <div 
         id="toastNotification" 
-        class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-3 bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-2xl border border-emerald-400/30"
+        class="fixed bottom-20 right-6 z-50 transform translate-y-6 opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-3 bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-2xl border border-emerald-400/30"
     >
         <span id="toastMessage" class="text-sm font-medium">已复制到剪贴簿！</span>
     </div>
@@ -243,12 +256,12 @@
     =========================================== -->
     <script>
         /**
-         * Google Apps Script 网路应用程式网址
-         * 以后如果更换了试算表脚本网址，只要改这一行引号里面的内容即可
+         * 【重要】请把下面引号里的内容，替换成你的 Cloudflare Worker 网址！
+         * 例如：const apiURL = 'https://api.你的域名.com'; 或 'https://song-list.xxx.workers.dev';
          */
         const apiURL = 'https://api.yoyomusic.site/';
 
-        // 内建保底歌单（在网路读取中、或读取失败时会暂时显示这份歌单）
+        // 内建保底歌单（在网路同步中、或读取失败时会暂时显示这份歌单）
         const DEFAULT_SONGS = [
             // --- 周杰伦 ---
             { title: "晴天", artist: "周杰伦", language: "国语", note: "校园经典" },
@@ -603,36 +616,32 @@
             { title: "Wonderful U", artist: "AGA", language: "英语", note: "强化版 / 浪漫抒情" }
         ];
 
-        // 语言分类与热门歌手清单
-        const CATEGORIES = ["全部", "国语", "粤语", "日语", "英语", "闽南语"];
+        // 语言分类与热门歌手清单（语种顺序：国语 -> 英语 -> 日语 -> 粤语 -> 闽南语）
+        const CATEGORIES = ["全部", "国语", "英语", "日语", "粤语", "闽南语"];
+        const LANGUAGE_SORT_ORDER = ["国语", "英语", "日语", "粤语", "闽南语"];
         const POPULAR_ARTISTS = [
             "全部歌手", "周杰伦", "林俊杰", "A-Lin", "张惠妹", "孙燕姿", 
             "蔡健雅", "薛之谦", "陶喆", "梁静茹", "王力宏", "邓紫棋", 
             "杨丞琳", "周兴哲", "方大同", "徐佳莹", "陈奕迅", "莫文蔚", "田馥甄"
         ];
 
+        // 语言标签配色对应（已统一为简体）
+        const LANGUAGE_COLORS = {
+            "国语": "bg-rose-500/20 text-rose-200 border-rose-400/30",
+            "英语": "bg-emerald-500/20 text-emerald-200 border-emerald-400/30",
+            "日语": "bg-sky-500/20 text-sky-200 border-sky-400/30",
+            "粤语": "bg-amber-500/20 text-amber-200 border-amber-400/30",
+            "闽南语": "bg-purple-500/20 text-purple-200 border-purple-400/30",
+            "其他": "bg-slate-500/20 text-slate-200 border-slate-400/30"
+        };
+
         // 状态管理变数
-        let allSongs = [...DEFAULT_SONGS];
+        let allSongs = [];
         let currentCategory = "全部";
         let currentArtist = "全部歌手";
         let currentSearchQuery = "";
         let currentRandomSong = null;
         let toastTimeout = null;
-
-        // 语言标签配色对应 (同时支援简体与繁体)
-        const LANGUAGE_COLORS = {
-            "国语": "bg-rose-500/20 text-rose-200 border-rose-400/30",
-            "國語": "bg-rose-500/20 text-rose-200 border-rose-400/30",
-            "日语": "bg-sky-500/20 text-sky-200 border-sky-400/30",
-            "日語": "bg-sky-500/20 text-sky-200 border-sky-400/30",
-            "粤语": "bg-amber-500/20 text-amber-200 border-amber-400/30",
-            "粵語": "bg-amber-500/20 text-amber-200 border-amber-400/30",
-            "英语": "bg-emerald-500/20 text-emerald-200 border-emerald-400/30",
-            "英語": "bg-emerald-500/20 text-emerald-200 border-emerald-400/30",
-            "闽南语": "bg-purple-500/20 text-purple-200 border-purple-400/30",
-            "閩南語": "bg-purple-500/20 text-purple-200 border-purple-400/30",
-            "其他": "bg-slate-500/20 text-slate-200 border-slate-400/30"
-        };
 
         // DOM 元素取得
         const searchInput = document.getElementById("searchInput");
@@ -647,6 +656,8 @@
         const resetFiltersBtn = document.getElementById("resetFiltersBtn");
         const randomPickBtn = document.getElementById("randomPickBtn");
         const dataSourceBadge = document.getElementById("dataSourceBadge");
+        const statusDot = document.getElementById("statusDot");
+        const backToTopBtn = document.getElementById("backToTopBtn");
 
         // 随机抽歌弹出视窗元素
         const randomModal = document.getElementById("randomModal");
@@ -654,59 +665,172 @@
         const modalCopyBtn = document.getElementById("modalCopyBtn");
 
         /**
-         * 初始化应用程式：先渲染画面，再向 Google 试算表同步歌单
+         * 将可能误填的繁体语种字统一转为简体（例如：國語 -> 国语，粵語 -> 粤语）
+         */
+        function normalizeLanguage(lang) {
+            const str = String(lang ?? "").trim();
+            if (!str) return "国语";
+            return str
+                .replace(/國/g, "国")
+                .replace(/語/g, "语")
+                .replace(/粵/g, "粤")
+                .replace(/閩/g, "闽");
+        }
+
+        /**
+         * 取得语种排序权重（国语 -> 英语 -> 日语 -> 粤语 -> 闽南语 -> 其他）
+         */
+        function getLanguagePriority(lang) {
+            const norm = normalizeLanguage(lang);
+            for (let i = 0; i < LANGUAGE_SORT_ORDER.length; i++) {
+                if (norm.includes(LANGUAGE_SORT_ORDER[i])) return i;
+            }
+            return LANGUAGE_SORT_ORDER.length;
+        }
+
+        /**
+         * 取得语种标签配色
+         */
+        function getLanguageBadgeClass(lang) {
+            const norm = normalizeLanguage(lang);
+            for (const key of Object.keys(LANGUAGE_COLORS)) {
+                if (key !== "其他" && norm.includes(key)) {
+                    return LANGUAGE_COLORS[key];
+                }
+            }
+            return LANGUAGE_COLORS["其他"];
+        }
+
+        /**
+         * 排法 A：
+         * 1. 按语言分区集中（国语 -> 英语 -> 日语 -> 粤语 -> 其他）
+         * 2. 同语种内保留原本歌手出现顺序聚在一起
+         * 3. 每位歌手的歌按歌名字数由少到多排列
+         */
+        function sortSongs(songs) {
+            const artistFirstIndex = new Map();
+
+            const enriched = songs.map((song, idx) => {
+                const normalizedSong = {
+                    title: String(song.title ?? "").trim(),
+                    artist: String(song.artist ?? "").trim() || "未知歌手",
+                    language: normalizeLanguage(song.language),
+                    note: String(song.note ?? "").trim()
+                };
+                const langPriority = getLanguagePriority(normalizedSong.language);
+                const artistKey = `${langPriority}__${normalizedSong.artist}`;
+
+                if (!artistFirstIndex.has(artistKey)) {
+                    artistFirstIndex.set(artistKey, idx);
+                }
+
+                return {
+                    song: normalizedSong,
+                    originalIndex: idx,
+                    langPriority,
+                    artistOrder: artistFirstIndex.get(artistKey),
+                    titleLength: normalizedSong.title.length
+                };
+            });
+
+            enriched.sort((a, b) => {
+                if (a.langPriority !== b.langPriority) {
+                    return a.langPriority - b.langPriority;
+                }
+                if (a.artistOrder !== b.artistOrder) {
+                    return a.artistOrder - b.artistOrder;
+                }
+                if (a.titleLength !== b.titleLength) {
+                    return a.titleLength - b.titleLength;
+                }
+                return a.originalIndex - b.originalIndex;
+            });
+
+            return enriched.map(item => item.song);
+        }
+
+        /**
+         * 设定顶部状态点颜色
+         */
+        function setStatusDot(type) {
+            if (type === "loading") {
+                statusDot.className = "w-2 h-2 rounded-full bg-sky-400 animate-pulse";
+            } else if (type === "success") {
+                statusDot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+            } else {
+                statusDot.className = "w-2 h-2 rounded-full bg-amber-400";
+            }
+        }
+
+        /**
+         * 初始化应用程式
          */
         async function initApp() {
             try {
                 localStorage.removeItem("user_google_sheet_csv_url");
             } catch (e) {}
 
-            // 先用内建歌单渲染，让网页打开瞬间就能浏览与搜索
-            dataSourceBadge.textContent = `目前共收录 ${allSongs.length} 首歌曲（正在同步云端歌单...）`;
+            // 1. 先排好预设歌单并渲染画面，确保打开秒开
+            allSongs = sortSongs(DEFAULT_SONGS);
+            setStatusDot("loading");
+            dataSourceBadge.textContent = "云端同步中，请稍等约 5 秒将自动加载最新歌单...";
             renderAllFiltersAndSongs();
             setupEventListeners();
 
-            // 向 Google 试算表抓取最新歌单
+            // 2. 向 Cloudflare Worker 抓取最新云端歌单
             await loadPlaylist();
         }
 
         /**
-         * 串接 Google Apps Script API 读取试算表歌单
+         * 通过 Cloudflare Worker 读取 Google 试算表歌单与更新时间
          */
         async function loadPlaylist() {
+            if (!apiURL || apiURL.includes("请替换成你的")) {
+                console.warn("请先在 index.html 的 apiURL 填入你的 Cloudflare Worker 网址！");
+                setStatusDot("fallback");
+                dataSourceBadge.textContent = `目前共收录 ${allSongs.length} 首歌曲（请先填入 Worker 网址）`;
+                return;
+            }
+
             try {
                 const response = await fetch(apiURL);
                 if (!response.ok) {
                     throw new Error(`HTTP 状态异常: ${response.status}`);
                 }
                 const rawData = await response.json();
-                console.log('成功取得歌单：', rawData);
+                console.log("成功取得云端歌单：", rawData);
 
-                // 兼容直接返回数组，或包在 data / songs / rows 里的格式
+                // 兼容 { updatedAt, songs } 包裹格式，也兼容纯数组格式
                 const rawList = Array.isArray(rawData)
                     ? rawData
                     : (rawData.songs || rawData.data || rawData.rows || []);
+                const updatedAt = (!Array.isArray(rawData) && rawData.updatedAt) ? String(rawData.updatedAt).trim() : "";
 
-                // 兼容英文栏位名或中文表头（歌名/歌手/语言/备注）
+                // 自动兼容中英文表头并转成简体
                 const formattedSongs = rawList
                     .map(item => ({
-                        title: String(item.title ?? item.song ?? item.name ?? item['歌名'] ?? item['歌曲'] ?? '').trim(),
-                        artist: String(item.artist ?? item.singer ?? item['歌手'] ?? item['艺人'] ?? '').trim() || '未知歌手',
-                        language: String(item.language ?? item.lang ?? item['语言'] ?? item['語言'] ?? item['语种'] ?? '').trim() || '国语',
-                        note: String(item.note ?? item.remark ?? item.remarks ?? item['备注'] ?? item['備註'] ?? item['备注 / 版本'] ?? item['版本'] ?? '').trim()
+                        title: String(item.title ?? item.song ?? item.name ?? item["歌名"] ?? item["歌曲"] ?? "").trim(),
+                        artist: String(item.artist ?? item.singer ?? item["歌手"] ?? item["艺人"] ?? "").trim() || "未知歌手",
+                        language: normalizeLanguage(item.language ?? item.lang ?? item["语言"] ?? item["語言"] ?? item["语种"] ?? "国语"),
+                        note: String(item.note ?? item.remark ?? item.remarks ?? item["备注"] ?? item["備註"] ?? item["备注 / 版本"] ?? item["版本"] ?? "").trim()
                     }))
-                    .filter(song => song.title !== '');
+                    .filter(song => song.title !== "");
 
                 if (formattedSongs.length > 0) {
-                    allSongs = formattedSongs;
-                    dataSourceBadge.textContent = `目前共收录 ${allSongs.length} 首歌曲（已同步云端歌单）`;
+                    allSongs = sortSongs(formattedSongs);
+                    setStatusDot("success");
+                    dataSourceBadge.textContent = updatedAt
+                        ? `目前共收录 ${allSongs.length} 首歌曲 · 已于 ${updatedAt} 新增`
+                        : `目前共收录 ${allSongs.length} 首歌曲 · 已同步云端歌单`;
                     renderAllFiltersAndSongs();
                 } else {
-                    dataSourceBadge.textContent = `目前共收录 ${allSongs.length} 首歌曲（云端尚无资料）`;
+                    setStatusDot("fallback");
+                    dataSourceBadge.textContent = `目前共收录 ${allSongs.length} 首歌曲（云端尚无资料，使用预设歌单）`;
                 }
             } catch (error) {
-                console.error('读取歌单失败：', error);
-                dataSourceBadge.textContent = `目前共收录 ${allSongs.length} 首歌曲（使用预设歌单）`;
+                console.error("读取云端歌单失败：", error);
+                setStatusDot("fallback");
+                dataSourceBadge.textContent = `目前共收录 ${allSongs.length} 首歌曲（云端连线失败，使用预设歌单）`;
             }
         }
 
@@ -720,20 +844,6 @@
         }
 
         /**
-         * 语言比对（自动兼容简繁体字，例如试算表填「國語」也能被「国语」筛选到）
-         */
-        function matchLanguage(songLang, filterCat) {
-            if (filterCat === "全部") return true;
-            if (!songLang) return false;
-            const normalized = String(songLang)
-                .replace(/國/g, "国")
-                .replace(/語/g, "语")
-                .replace(/粵/g, "粤")
-                .replace(/閩/g, "闽");
-            return normalized.includes(filterCat);
-        }
-
-        /**
          * 取得符合目前「语言 + 歌手 + 搜寻词」的歌曲
          */
         function getFilteredSongs() {
@@ -742,8 +852,9 @@
                 const title = String(song.title || "");
                 const artist = String(song.artist || "");
                 const note = String(song.note || "");
+                const language = normalizeLanguage(song.language);
 
-                const matchCategory = matchLanguage(song.language, currentCategory);
+                const matchCategory = (currentCategory === "全部") || language.includes(currentCategory);
                 const matchArtist = (currentArtist === "全部歌手") || artist.includes(currentArtist);
                 const matchQuery = !query || 
                     title.toLowerCase().includes(query) ||
@@ -766,8 +877,9 @@
                     const title = String(song.title || "");
                     const artist = String(song.artist || "");
                     const note = String(song.note || "");
+                    const language = normalizeLanguage(song.language);
 
-                    const matchCat = matchLanguage(song.language, category);
+                    const matchCat = (category === "全部") || language.includes(category);
                     const matchArt = (currentArtist === "全部歌手") || artist.includes(currentArtist);
                     const matchQ = !query || 
                         title.toLowerCase().includes(query) ||
@@ -845,7 +957,7 @@
             emptyStateEl.classList.add("hidden");
 
             filtered.forEach((song, index) => {
-                const badgeClass = LANGUAGE_COLORS[song.language] || LANGUAGE_COLORS["其他"];
+                const badgeClass = getLanguageBadgeClass(song.language);
                 const row = document.createElement("div");
                 row.id = `song-row-${index}`;
                 row.className = "group hover:bg-white/10 active:bg-white/15 transition cursor-pointer px-4 sm:px-6 py-3.5";
@@ -900,6 +1012,16 @@
         function copySongToClipboard(song) {
             const textToCopy = `${song.title} - ${song.artist}`;
 
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textToCopy)
+                    .then(() => showToast(`已复制：「${textToCopy}」`))
+                    .catch(() => fallbackCopy(textToCopy));
+            } else {
+                fallbackCopy(textToCopy);
+            }
+        }
+
+        function fallbackCopy(textToCopy) {
             const tempInput = document.createElement("textarea");
             tempInput.value = textToCopy;
             tempInput.style.position = "fixed";
@@ -925,13 +1047,13 @@
             const toastMsg = document.getElementById("toastMessage");
             toastMsg.textContent = message;
 
-            toast.classList.remove("translate-y-20", "opacity-0");
+            toast.classList.remove("translate-y-6", "opacity-0");
             toast.classList.add("translate-y-0", "opacity-100");
 
             if (toastTimeout) clearTimeout(toastTimeout);
             toastTimeout = setTimeout(() => {
                 toast.classList.remove("translate-y-0", "opacity-100");
-                toast.classList.add("translate-y-20", "opacity-0");
+                toast.classList.add("translate-y-6", "opacity-0");
             }, 2500);
         }
 
@@ -950,7 +1072,7 @@
 
             const badgeEl = document.getElementById("modalLanguageBadge");
             badgeEl.textContent = currentRandomSong.language;
-            badgeEl.className = `inline-block text-xs px-2.5 py-0.5 rounded-md mb-2 border font-medium ${LANGUAGE_COLORS[currentRandomSong.language] || LANGUAGE_COLORS["其他"]}`;
+            badgeEl.className = `inline-block text-xs px-2.5 py-0.5 rounded-md mb-2 border font-medium ${getLanguageBadgeClass(currentRandomSong.language)}`;
 
             document.getElementById("modalSongTitle").textContent = currentRandomSong.title;
             document.getElementById("modalSongArtist").textContent = currentRandomSong.artist;
@@ -981,6 +1103,19 @@
             currentArtist = "全部歌手";
             clearSearchBtn.classList.add("hidden");
             renderAllFiltersAndSongs();
+        }
+
+        /**
+         * 控制回到置顶按钮的显示与隐藏
+         */
+        function updateBackToTopVisibility() {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.remove("opacity-0", "pointer-events-none", "translate-y-4");
+                backToTopBtn.classList.add("opacity-100", "translate-y-0");
+            } else {
+                backToTopBtn.classList.remove("opacity-100", "translate-y-0");
+                backToTopBtn.classList.add("opacity-0", "pointer-events-none", "translate-y-4");
+            }
         }
 
         /**
@@ -1015,6 +1150,12 @@
                     copySongToClipboard(currentRandomSong);
                     randomModal.classList.add("hidden");
                 }
+            });
+
+            // 回到顶部按钮点击与页面滚动监听
+            window.addEventListener("scroll", updateBackToTopVisibility, { passive: true });
+            backToTopBtn.addEventListener("click", () => {
+                window.scrollTo({ top: 0, behavior: "smooth" });
             });
         }
 
